@@ -7,38 +7,43 @@ import (
 	"github.com/adrianmo/go-nmea"
 )
 
-type WrappedZDA struct {
-	s nmea.ZDA
+type wrappedZDA struct {
+	nmea.ZDA
+}
+
+func NewZDA(s nmea.ZDA) wrappedZDA {
+	result := wrappedZDA{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedZDA) String() string {
-	return w.s.String()
+func (w wrappedZDA) String() string {
+	return w.ZDA.String()
 }
 
-func (w WrappedZDA) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedZDA) Prefix() string {
+	return w.ZDA.Prefix()
 }
 
-func (w WrappedZDA) DataType() string {
-	return w.s.DataType()
+func (w wrappedZDA) DataType() string {
+	return w.ZDA.DataType()
 }
 
-func (w WrappedZDA) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedZDA) TalkerID() string {
+	return w.ZDA.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedZDA) GetDateTime() (string, error) {
-	if w.s.Time.Valid {
+func (w wrappedZDA) GetDateTime() (string, error) {
+	if w.Time.Valid {
 		return time.Date(
-			int(w.s.Year),
-			time.Month(w.s.Month),
-			int(w.s.Day),
-			w.s.Time.Hour+int(w.s.OffsetHours),
-			w.s.Time.Minute+int(w.s.OffsetMinutes),
-			w.s.Time.Second,
-			w.s.Time.Millisecond*1000000,
+			int(w.Year),
+			time.Month(w.Month),
+			int(w.Day),
+			w.Time.Hour+int(w.OffsetHours),
+			w.Time.Minute+int(w.OffsetMinutes),
+			w.Time.Second,
+			w.Time.Millisecond*1000000,
 			time.UTC,
 		).UTC().Format(time.RFC3339Nano), nil
 	}

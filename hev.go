@@ -9,8 +9,13 @@ type HEV struct {
 	Heave float64 // Heave in meters
 }
 
-type WrappedHEV struct {
-	s HEV
+type wrappedHEV struct {
+	HEV
+}
+
+func NewHEV(s HEV) wrappedHEV {
+	result := wrappedHEV{s}
+	return result
 }
 
 func init() {
@@ -24,23 +29,23 @@ func init() {
 }
 
 // implement nmea.Sentence functions
-func (w WrappedHEV) String() string {
-	return w.s.String()
+func (w wrappedHEV) String() string {
+	return w.HEV.String()
 }
 
-func (w WrappedHEV) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedHEV) Prefix() string {
+	return w.HEV.Prefix()
 }
 
-func (w WrappedHEV) DataType() string {
-	return w.s.DataType()
+func (w wrappedHEV) DataType() string {
+	return w.HEV.DataType()
 }
 
-func (w WrappedHEV) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedHEV) TalkerID() string {
+	return w.HEV.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedHEV) GetHeave() (float64, error) {
-	return w.s.Heave, nil
+func (w wrappedHEV) GetHeave() (float64, error) {
+	return w.Heave, nil
 }

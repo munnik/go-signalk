@@ -5,39 +5,44 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedVHW struct {
-	s nmea.VHW
+type wrappedVHW struct {
+	nmea.VHW
+}
+
+func NewVHW(s nmea.VHW) wrappedVHW {
+	result := wrappedVHW{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedVHW) String() string {
-	return w.s.String()
+func (w wrappedVHW) String() string {
+	return w.VHW.String()
 }
 
-func (w WrappedVHW) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedVHW) Prefix() string {
+	return w.VHW.Prefix()
 }
 
-func (w WrappedVHW) DataType() string {
-	return w.s.DataType()
+func (w wrappedVHW) DataType() string {
+	return w.VHW.DataType()
 }
 
-func (w WrappedVHW) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedVHW) TalkerID() string {
+	return w.VHW.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedVHW) GetMagneticHeading() (float64, error) {
-	return (unit.Angle(w.s.MagneticHeading) * unit.Degree).Radians(), nil
+func (w wrappedVHW) GetMagneticHeading() (float64, error) {
+	return (unit.Angle(w.MagneticHeading) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedVHW) GetTrueHeading() (float64, error) {
-	return (unit.Angle(w.s.TrueHeading) * unit.Degree).Radians(), nil
+func (w wrappedVHW) GetTrueHeading() (float64, error) {
+	return (unit.Angle(w.TrueHeading) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedVHW) GetSpeedThroughWater() (float64, error) {
-	if w.s.SpeedThroughWaterKPH == 0 && w.s.SpeedThroughWaterKnots > 0 {
-		return (unit.Speed(w.s.SpeedThroughWaterKnots) * unit.Knot).MetersPerSecond(), nil
+func (w wrappedVHW) GetSpeedThroughWater() (float64, error) {
+	if w.SpeedThroughWaterKPH == 0 && w.SpeedThroughWaterKnots > 0 {
+		return (unit.Speed(w.SpeedThroughWaterKnots) * unit.Knot).MetersPerSecond(), nil
 	}
-	return (unit.Speed(w.s.SpeedThroughWaterKPH) * unit.KilometersPerHour).MetersPerSecond(), nil
+	return (unit.Speed(w.SpeedThroughWaterKPH) * unit.KilometersPerHour).MetersPerSecond(), nil
 }

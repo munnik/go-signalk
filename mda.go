@@ -7,74 +7,79 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedMDA struct {
-	s nmea.MDA
+type wrappedMDA struct {
+	nmea.MDA
+}
+
+func NewMDA(s nmea.MDA) wrappedMDA {
+	result := wrappedMDA{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedMDA) String() string {
-	return w.s.String()
+func (w wrappedMDA) String() string {
+	return w.MDA.String()
 }
 
-func (w WrappedMDA) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedMDA) Prefix() string {
+	return w.MDA.Prefix()
 }
 
-func (w WrappedMDA) DataType() string {
-	return w.s.DataType()
+func (w wrappedMDA) DataType() string {
+	return w.MDA.DataType()
 }
 
-func (w WrappedMDA) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedMDA) TalkerID() string {
+	return w.MDA.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedMDA) GetTrueWindDirection() (float64, error) {
-	return (unit.Angle(w.s.WindDirectionTrue) * unit.Degree).Radians(), nil
+func (w wrappedMDA) GetTrueWindDirection() (float64, error) {
+	return (unit.Angle(w.WindDirectionTrue) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedMDA) GetMagneticWindDirection() (float64, error) {
-	return (unit.Angle(w.s.WindDirectionMagnetic) * unit.Degree).Radians(), nil
+func (w wrappedMDA) GetMagneticWindDirection() (float64, error) {
+	return (unit.Angle(w.WindDirectionMagnetic) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedMDA) GetWindSpeed() (float64, error) {
-	if w.s.WindSpeedMeters > 0 {
-		return w.s.WindSpeedMeters, nil
+func (w wrappedMDA) GetWindSpeed() (float64, error) {
+	if w.WindSpeedMeters > 0 {
+		return w.WindSpeedMeters, nil
 	}
-	return (unit.Speed(w.s.WindSpeedKnots) * unit.Knot).MetersPerSecond(), nil
+	return (unit.Speed(w.WindSpeedKnots) * unit.Knot).MetersPerSecond(), nil
 }
 
-func (w WrappedMDA) GetOutsideTemperature() (float64, error) {
-	if w.s.AirTempValid {
-		return unit.FromCelsius(w.s.AirTemp).Kelvin(), nil
-	}
-	return 0, fmt.Errorf("value is unavailable")
-}
-
-func (w WrappedMDA) GetWaterTemperature() (float64, error) {
-	if w.s.WaterTempValid {
-		return unit.FromCelsius(w.s.WaterTemp).Kelvin(), nil
+func (w wrappedMDA) GetOutsideTemperature() (float64, error) {
+	if w.AirTempValid {
+		return unit.FromCelsius(w.AirTemp).Kelvin(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedMDA) GetDewPointTemperature() (float64, error) {
-	if w.s.DewPointValid {
-		return unit.FromCelsius(w.s.DewPoint).Kelvin(), nil
+func (w wrappedMDA) GetWaterTemperature() (float64, error) {
+	if w.WaterTempValid {
+		return unit.FromCelsius(w.WaterTemp).Kelvin(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedMDA) GetOutsidePressure() (float64, error) {
-	if w.s.PressureBar > 0 {
-		return (unit.Pressure(w.s.PressureBar) * unit.Bar).Pascals(), nil
-	}
-	if w.s.PressureInch > 0 {
-		return (unit.Pressure(w.s.PressureInch) * unit.InchOfMercury).Pascals(), nil
+func (w wrappedMDA) GetDewPointTemperature() (float64, error) {
+	if w.DewPointValid {
+		return unit.FromCelsius(w.DewPoint).Kelvin(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedMDA) GetHumidity() (float64, error) {
-	return w.s.RelativeHum / 100.0, nil
+func (w wrappedMDA) GetOutsidePressure() (float64, error) {
+	if w.PressureBar > 0 {
+		return (unit.Pressure(w.PressureBar) * unit.Bar).Pascals(), nil
+	}
+	if w.PressureInch > 0 {
+		return (unit.Pressure(w.PressureInch) * unit.InchOfMercury).Pascals(), nil
+	}
+	return 0, fmt.Errorf("value is unavailable")
+}
+
+func (w wrappedMDA) GetHumidity() (float64, error) {
+	return w.RelativeHum / 100.0, nil
 }

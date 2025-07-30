@@ -7,31 +7,36 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedROT struct {
-	s nmea.ROT
+type wrappedROT struct {
+	nmea.ROT
+}
+
+func NewROT(s nmea.ROT) wrappedROT {
+	result := wrappedROT{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedROT) String() string {
-	return w.s.String()
+func (w wrappedROT) String() string {
+	return w.ROT.String()
 }
 
-func (w WrappedROT) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedROT) Prefix() string {
+	return w.ROT.Prefix()
 }
 
-func (w WrappedROT) DataType() string {
-	return w.s.DataType()
+func (w wrappedROT) DataType() string {
+	return w.ROT.DataType()
 }
 
-func (w WrappedROT) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedROT) TalkerID() string {
+	return w.ROT.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedROT) GetRateOfTurn() (float64, error) {
-	if w.s.Valid {
-		return (unit.Angle(w.s.RateOfTurn) * unit.Degree).Radians() / unit.Minute.Seconds(), nil
+func (w wrappedROT) GetRateOfTurn() (float64, error) {
+	if w.Valid {
+		return (unit.Angle(w.RateOfTurn) * unit.Degree).Radians() / unit.Minute.Seconds(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }

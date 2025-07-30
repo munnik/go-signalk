@@ -6,31 +6,36 @@ import (
 	"github.com/adrianmo/go-nmea"
 )
 
-type WrappedGLL struct {
-	s nmea.GLL
+type wrappedGLL struct {
+	nmea.GLL
+}
+
+func NewGLL(s nmea.GLL) wrappedGLL {
+	result := wrappedGLL{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedGLL) String() string {
-	return w.s.String()
+func (w wrappedGLL) String() string {
+	return w.GLL.String()
 }
 
-func (w WrappedGLL) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedGLL) Prefix() string {
+	return w.GLL.Prefix()
 }
 
-func (w WrappedGLL) DataType() string {
-	return w.s.DataType()
+func (w wrappedGLL) DataType() string {
+	return w.GLL.DataType()
 }
 
-func (w WrappedGLL) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedGLL) TalkerID() string {
+	return w.GLL.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedGLL) GetPosition2D() (float64, float64, error) {
-	if w.s.Validity != nmea.ValidGLL {
-		return w.s.Latitude, w.s.Longitude, nil
+func (w wrappedGLL) GetPosition2D() (float64, float64, error) {
+	if w.Validity != nmea.ValidGLL {
+		return w.Latitude, w.Longitude, nil
 	}
 	return 0, 0, fmt.Errorf("value is unavailable")
 }

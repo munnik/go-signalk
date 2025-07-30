@@ -8,46 +8,51 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedVBW struct {
-	s nmea.VBW
+type wrappedVBW struct {
+	nmea.VBW
+}
+
+func NewVBW(s nmea.VBW) wrappedVBW {
+	result := wrappedVBW{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedVBW) String() string {
-	return w.s.String()
+func (w wrappedVBW) String() string {
+	return w.VBW.String()
 }
 
-func (w WrappedVBW) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedVBW) Prefix() string {
+	return w.VBW.Prefix()
 }
 
-func (w WrappedVBW) DataType() string {
-	return w.s.DataType()
+func (w wrappedVBW) DataType() string {
+	return w.VBW.DataType()
 }
 
-func (w WrappedVBW) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedVBW) TalkerID() string {
+	return w.VBW.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedVBW) GetSpeedThroughWater() (float64, error) {
-	if w.s.WaterSpeedStatusValid {
-		speed := w.s.LongitudinalWaterSpeedKnots / math.Abs(w.s.LongitudinalWaterSpeedKnots) * math.Sqrt(math.Pow(w.s.LongitudinalWaterSpeedKnots, 2)+math.Pow(w.s.TransverseWaterSpeedKnots, 2))
+func (w wrappedVBW) GetSpeedThroughWater() (float64, error) {
+	if w.WaterSpeedStatusValid {
+		speed := w.LongitudinalWaterSpeedKnots / math.Abs(w.LongitudinalWaterSpeedKnots) * math.Sqrt(math.Pow(w.LongitudinalWaterSpeedKnots, 2)+math.Pow(w.TransverseWaterSpeedKnots, 2))
 		return (unit.Speed(speed) * unit.Knot).MetersPerSecond(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVBW) GetSpeedThroughWaterTransverse() (float64, error) {
-	if w.s.WaterSpeedStatusValid {
-		return (unit.Speed(w.s.TransverseWaterSpeedKnots) * unit.Knot).MetersPerSecond(), nil
+func (w wrappedVBW) GetSpeedThroughWaterTransverse() (float64, error) {
+	if w.WaterSpeedStatusValid {
+		return (unit.Speed(w.TransverseWaterSpeedKnots) * unit.Knot).MetersPerSecond(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVBW) GetSpeedThroughWaterLongitudinal() (float64, error) {
-	if w.s.WaterSpeedStatusValid {
-		return (unit.Speed(w.s.LongitudinalWaterSpeedKnots) * unit.Knot).MetersPerSecond(), nil
+func (w wrappedVBW) GetSpeedThroughWaterLongitudinal() (float64, error) {
+	if w.WaterSpeedStatusValid {
+		return (unit.Speed(w.LongitudinalWaterSpeedKnots) * unit.Knot).MetersPerSecond(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }

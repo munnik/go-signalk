@@ -222,178 +222,54 @@ func Parse(raw string) (nmea.Sentence, error) {
 	}
 
 	switch s := s.(type) {
+	case nmea.DBS:
+		return NewDBS(s), nil
+	case nmea.DBT:
+		return NewDBT(s), nil
+	case nmea.DPT:
+		return NewDPT(s), nil
+	case nmea.GGA:
+		return NewGGA(s), nil
+	case nmea.GLL:
+		return NewGLL(s), nil
+	case nmea.GNS:
+		return NewGNS(s), nil
+	case nmea.GSA:
+		return NewGSA(s), nil
+	case nmea.GSV:
+		return NewGSV(s), nil
+	case nmea.HDT:
+		return NewHDT(s), nil
+	case HEV:
+		return NewHEV(s), nil
+	case nmea.MDA:
+		return NewMDA(s), nil
+	case nmea.MWD:
+		return NewMWD(s), nil
+	case nmea.MWV:
+		return NewMWV(s), nil
 	case nmea.RMC:
-		return WrappedRMC{s: s}, nil
-		// case nmea.TypeAAM:
-		// 	return newAAM(s)
-		// case nmea.TypeACK:
-		// 	return newACK(s)
-		// case nmea.TypeACN:
-		// 	return newACN(s)
-		// case nmea.TypeALA:
-		// 	return newALA(s)
-		// case nmea.TypeALC:
-		// 	return newALC(s)
-		// case nmea.TypeALF:
-		// 	return newALF(s)
-		// case nmea.TypeALR:
-		// 	return newALR(s)
-		// case nmea.TypeAPB:
-		// 	return newAPB(s)
-		// case nmea.TypeARC:
-		// 	return newARC(s)
-		// case nmea.TypeBEC:
-		// 	return newBEC(s)
-		// case nmea.TypeBOD:
-		// 	return newBOD(s)
-		// case nmea.TypeBWC:
-		// 	return newBWC(s)
-		// case nmea.TypeBWR:
-		// 	return newBWR(s)
-		// case nmea.TypeBWW:
-		// 	return newBWW(s)
-		// case nmea.TypeDOR:
-		// 	return newDOR(s)
-		// case nmea.TypeDSC:
-		// 	return newDSC(s)
-		// case nmea.TypeDSE:
-		// 	return newDSE(s)
-		// case nmea.TypeDTM:
-		// 	return newDTM(s)
-		// case nmea.TypeEVE:
-		// 	return newEVE(s)
-		// case nmea.TypeFIR:
-		// 	return newFIR(s)
-		// case nmea.TypeGGA:
-		// 	return newGGA(s)
-		// case nmea.TypeGSA:
-		// 	return newGSA(s)
-		// case nmea.TypeGLL:
-		// 	return newGLL(s)
-		// case nmea.TypeVTG:
-		// 	return newVTG(s)
-		// case nmea.TypeZDA:
-		// 	return newZDA(s)
-		// case nmea.TypePGN:
-		// 	return newPGN(s)
-		// case nmea.TypePCDIN:
-		// 	return newPCDIN(s)
-		// case nmea.TypePGRME:
-		// 	return newPGRME(s)
-		// case nmea.TypePGRMT:
-		// 	return newPGRMT(s)
-		// case nmea.TypePHTRO:
-		// 	return newPHTRO(s)
-		// case nmea.TypePMTK001:
-		// 	return newPMTK001(s)
-		// case nmea.TypePRDID:
-		// 	return newPRDID(s)
-		// case nmea.TypePSKPDPT:
-		// 	return newPSKPDPT(s)
-		// case nmea.TypePSONCMS:
-		// 	return newPSONCMS(s)
-		// case nmea.TypeQuery:
-		// 	return newQuery(s)
-		// case nmea.TypeGSV:
-		// 	return newGSV(s)
-		// case nmea.TypeHBT:
-		// 	return newHBT(s)
-		// case nmea.TypeHDG:
-		// 	return newHDG(s)
-		// case nmea.TypeHDT:
-		// 	return newHDT(s)
-		// case nmea.TypeHDM:
-		// 	return newHDM(s)
-		// case nmea.TypeHSC:
-		// 	return newHSC(s)
-		// case nmea.TypeGNS:
-		// 	return newGNS(s)
-		// case nmea.TypeTHS:
-		// 	return newTHS(s)
-		// case nmea.TypeTLB:
-		// 	return newTLB(s)
-		// case nmea.TypeTLL:
-		// 	return newTLL(s)
-		// case nmea.TypeTTM:
-		// 	return newTTM(s)
-		// case nmea.TypeTXT:
-		// 	return newTXT(s)
-		// case nmea.TypeWPL:
-		// 	return newWPL(s)
-		// case nmea.TypeRMB:
-		// 	return newRMB(s)
-		// case nmea.TypeRPM:
-		// 	return newRPM(s)
-		// case nmea.TypeRSA:
-		// 	return newRSA(s)
-		// case nmea.TypeRSD:
-		// 	return newRSD(s)
-		// case nmea.TypeRTE:
-		// 	return newRTE(s)
-		// case nmea.TypeROT:
-		// 	return newROT(s)
-		// case nmea.TypeVBW:
-		// 	return newVBW(s)
-		// case nmea.TypeVDR:
-		// 	return newVDR(s)
-		// case nmea.TypeVHW:
-		// 	return newVHW(s)
-		// case nmea.TypeVSD:
-		// 	return newVSD(s)
-		// case nmea.TypeVPW:
-		// 	return newVPW(s)
-		// case nmea.TypeVLW:
-		// 	return newVLW(s)
-		// case nmea.TypeVWR:
-		// 	return newVWR(s)
-		// case nmea.TypeVWT:
-		// 	return newVWT(s)
-		// case nmea.TypeDPT:
-		// 	return newDPT(s)
-		// case nmea.TypeDBT:
-		// 	return newDBT(s)
-		// case nmea.TypeDBK:
-		// 	return newDBK(s)
-		// case nmea.TypeDBS:
-		// 	return newDBS(s)
-		// case nmea.TypeMDA:
-		// 	return newMDA(s)
-		// case nmea.TypeMTA:
-		// 	return newMTA(s)
-		// case nmea.TypeMTW:
-		// 	return newMTW(s)
-		// case nmea.TypeMWD:
-		// 	return newMWD(s)
-		// case nmea.TypeMWV:
-		// 	return newMWV(s)
-		// case nmea.TypeOSD:
-		// 	return newOSD(s)
-		// case nmea.TypeXDR:
-		// 	return newXDR(s)
-		// case nmea.TypeXTE:
-		// 	return newXTE(s)
-		// case nmea.TypePKLID:
-		// 	return newPKLID(s)
-		// case nmea.TypePKNID:
-		// 	return newPKNID(s)
-		// case nmea.TypePKLSH:
-		// 	return newPKLSH(s)
-		// case nmea.TypePKNSH:
-		// 	return newPKNSH(s)
-		// case nmea.TypePKLDS:
-		// 	return newPKLDS(s)
-		// case nmea.TypePKNDS:
-		// 	return newPKNDS(s)
-		// case nmea.TypePKWDWPL:
-		// 	return newPKWDWPL(s)
-		// case nmea.TypeABM:
-		// 	return newABM(s)
-		// case nmea.TypeBBM:
-		// 	return newBBM(s)
-		// case nmea.TypeTTD:
-		// 	return newTTD(s)
-		// case nmea.TypeVDM, TypeVDO:
-		// 	return newVDMVDO(s)
+		return NewRMC(s), nil
+	case nmea.ROT:
+		return NewROT(s), nil
+	case nmea.RSA:
+		return NewRSA(s), nil
+	case nmea.THS:
+		return NewTHS(s), nil
+	case nmea.VBW:
+		return NewVBW(s), nil
+	case nmea.VDMVDO:
+		return NewVDMVDO(s), nil
+	case nmea.VHW:
+		return NewVHW(s), nil
+	case nmea.VLW:
+		return NewVLW(s), nil
+	case nmea.VTG:
+		return NewVTG(s), nil
+	case nmea.VWR:
+		return NewVWR(s), nil
+	case nmea.ZDA:
+		return NewZDA(s), nil
 	}
 	return s, fmt.Errorf("could not convert to SignalK sentence, %s is not supported", s.DataType())
 }

@@ -7,31 +7,36 @@ import (
 	"github.com/adrianmo/go-nmea"
 )
 
-type WrappedGNS struct {
-	s nmea.GNS
+type wrappedGNS struct {
+	nmea.GNS
+}
+
+func NewGNS(s nmea.GNS) wrappedGNS {
+	result := wrappedGNS{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedGNS) String() string {
-	return w.s.String()
+func (w wrappedGNS) String() string {
+	return w.GNS.String()
 }
 
-func (w WrappedGNS) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedGNS) Prefix() string {
+	return w.GNS.Prefix()
 }
 
-func (w WrappedGNS) DataType() string {
-	return w.s.DataType()
+func (w wrappedGNS) DataType() string {
+	return w.GNS.DataType()
 }
 
-func (w WrappedGNS) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedGNS) TalkerID() string {
+	return w.GNS.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedGNS) GetPosition3D() (float64, float64, float64, error) {
-	if !slices.Contains(w.s.Mode, nmea.NoFixGNS) {
-		return w.s.Latitude, w.s.Longitude, w.s.Altitude, nil
+func (w wrappedGNS) GetPosition3D() (float64, float64, float64, error) {
+	if !slices.Contains(w.Mode, nmea.NoFixGNS) {
+		return w.Latitude, w.Longitude, w.Altitude, nil
 	}
 	return 0, 0, 0, fmt.Errorf("value is unavailable")
 }

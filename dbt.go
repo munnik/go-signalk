@@ -7,36 +7,41 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedDBT struct {
-	s nmea.DBT
+type wrappedDBT struct {
+	nmea.DBT
+}
+
+func NewDBT(s nmea.DBT) wrappedDBT {
+	result := wrappedDBT{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedDBT) String() string {
-	return w.s.String()
+func (w wrappedDBT) String() string {
+	return w.DBT.String()
 }
 
-func (w WrappedDBT) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedDBT) Prefix() string {
+	return w.DBT.Prefix()
 }
 
-func (w WrappedDBT) DataType() string {
-	return w.s.DataType()
+func (w wrappedDBT) DataType() string {
+	return w.DBT.DataType()
 }
 
-func (w WrappedDBT) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedDBT) TalkerID() string {
+	return w.DBT.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedDBT) GetDepthBelowTransducer() (float64, error) {
-	if v := w.s.DepthMeters; v > 0 {
+func (w wrappedDBT) GetDepthBelowTransducer() (float64, error) {
+	if v := w.DepthMeters; v > 0 {
 		return v, nil
 	}
-	if v := w.s.DepthFeet; v > 0 {
+	if v := w.DepthFeet; v > 0 {
 		return (unit.Length(v) * unit.Foot).Meters(), nil
 	}
-	if v := w.s.DepthFathoms; v > 0 {
+	if v := w.DepthFathoms; v > 0 {
 		return (unit.Length(v) * unit.Fathom).Meters(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")

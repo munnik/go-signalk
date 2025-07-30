@@ -7,31 +7,36 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedHDT struct {
-	s nmea.HDT
+type wrappedHDT struct {
+	nmea.HDT
+}
+
+func NewHDT(s nmea.HDT) wrappedHDT {
+	result := wrappedHDT{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedHDT) String() string {
-	return w.s.String()
+func (w wrappedHDT) String() string {
+	return w.HDT.String()
 }
 
-func (w WrappedHDT) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedHDT) Prefix() string {
+	return w.HDT.Prefix()
 }
 
-func (w WrappedHDT) DataType() string {
-	return w.s.DataType()
+func (w wrappedHDT) DataType() string {
+	return w.HDT.DataType()
 }
 
-func (w WrappedHDT) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedHDT) TalkerID() string {
+	return w.HDT.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedHDT) GetTrueHeading() (float64, error) {
-	if w.s.True {
-		return (unit.Angle(w.s.Heading) * unit.Degree).Radians(), nil
+func (w wrappedHDT) GetTrueHeading() (float64, error) {
+	if w.True {
+		return (unit.Angle(w.Heading) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }

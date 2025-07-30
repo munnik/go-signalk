@@ -5,39 +5,44 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedVTG struct {
-	s nmea.VTG
+type wrappedVTG struct {
+	nmea.VTG
+}
+
+func NewVTG(s nmea.VTG) wrappedVTG {
+	result := wrappedVTG{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedVTG) String() string {
-	return w.s.String()
+func (w wrappedVTG) String() string {
+	return w.VTG.String()
 }
 
-func (w WrappedVTG) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedVTG) Prefix() string {
+	return w.VTG.Prefix()
 }
 
-func (w WrappedVTG) DataType() string {
-	return w.s.DataType()
+func (w wrappedVTG) DataType() string {
+	return w.VTG.DataType()
 }
 
-func (w WrappedVTG) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedVTG) TalkerID() string {
+	return w.VTG.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedVTG) GetTrueCourseOverGround() (float64, error) {
-	return (unit.Angle(w.s.TrueTrack) * unit.Degree).Radians(), nil
+func (w wrappedVTG) GetTrueCourseOverGround() (float64, error) {
+	return (unit.Angle(w.TrueTrack) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedVTG) GetMagneticCourseOverGround() (float64, error) {
-	return (unit.Angle(w.s.MagneticTrack) * unit.Degree).Radians(), nil
+func (w wrappedVTG) GetMagneticCourseOverGround() (float64, error) {
+	return (unit.Angle(w.MagneticTrack) * unit.Degree).Radians(), nil
 }
 
-func (w WrappedVTG) GetSpeedOverGround() (float64, error) {
-	if w.s.GroundSpeedKPH == 0 && w.s.GroundSpeedKnots > 0 {
-		return (unit.Speed(w.s.GroundSpeedKnots) * unit.Knot).MetersPerSecond(), nil
+func (w wrappedVTG) GetSpeedOverGround() (float64, error) {
+	if w.GroundSpeedKPH == 0 && w.GroundSpeedKnots > 0 {
+		return (unit.Speed(w.GroundSpeedKnots) * unit.Knot).MetersPerSecond(), nil
 	}
-	return (unit.Speed(w.s.GroundSpeedKPH) * unit.KilometersPerHour).MetersPerSecond(), nil
+	return (unit.Speed(w.GroundSpeedKPH) * unit.KilometersPerHour).MetersPerSecond(), nil
 }

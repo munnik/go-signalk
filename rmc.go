@@ -8,67 +8,72 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedRMC struct {
-	s nmea.RMC
+type wrappedRMC struct {
+	nmea.RMC
 }
 
 // implement nmea.Sentence functions
-func (w WrappedRMC) String() string {
-	return w.s.String()
+func (w wrappedRMC) String() string {
+	return w.RMC.String()
 }
 
-func (w WrappedRMC) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedRMC) Prefix() string {
+	return w.RMC.Prefix()
 }
 
-func (w WrappedRMC) DataType() string {
-	return w.s.DataType()
+func (w wrappedRMC) DataType() string {
+	return w.RMC.DataType()
 }
 
-func (w WrappedRMC) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedRMC) TalkerID() string {
+	return w.RMC.TalkerID()
+}
+
+func NewRMC(s nmea.RMC) wrappedRMC {
+	result := wrappedRMC{s}
+	return result
 }
 
 // implement SignalK functions
-func (w WrappedRMC) GetMagneticVariation() (float64, error) {
-	if w.s.Validity == nmea.ValidRMC {
-		return (unit.Angle(w.s.Variation) * unit.Degree).Radians(), nil
+func (w wrappedRMC) GetMagneticVariation() (float64, error) {
+	if w.Validity == nmea.ValidRMC {
+		return (unit.Angle(w.Variation) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedRMC) GetTrueCourseOverGround() (float64, error) {
-	if w.s.Validity == nmea.ValidRMC {
-		return (unit.Angle(w.s.Course) * unit.Degree).Radians(), nil
+func (w wrappedRMC) GetTrueCourseOverGround() (float64, error) {
+	if w.Validity == nmea.ValidRMC {
+		return (unit.Angle(w.Course) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedRMC) GetPosition2D() (float64, float64, error) {
-	if w.s.Validity == nmea.ValidRMC {
-		return w.s.Latitude, w.s.Longitude, nil
+func (w wrappedRMC) GetPosition2D() (float64, float64, error) {
+	if w.Validity == nmea.ValidRMC {
+		return w.Latitude, w.Longitude, nil
 	}
 	return 0, 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedRMC) GetSpeedOverGround() (float64, error) {
-	if w.s.Validity == nmea.ValidRMC {
-		return (unit.Speed(w.s.Speed) * unit.Knot).MetersPerSecond(), nil
+func (w wrappedRMC) GetSpeedOverGround() (float64, error) {
+	if w.Validity == nmea.ValidRMC {
+		return (unit.Speed(w.Speed) * unit.Knot).MetersPerSecond(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedRMC) GetDateTime() (string, error) {
-	if w.s.Validity == nmea.ValidRMC {
-		if w.s.Date.Valid && w.s.Time.Valid {
+func (w wrappedRMC) GetDateTime() (string, error) {
+	if w.Validity == nmea.ValidRMC {
+		if w.Date.Valid && w.Time.Valid {
 			return time.Date(
-				w.s.Date.YY,
-				time.Month(w.s.Date.MM),
-				w.s.Date.DD,
-				w.s.Time.Hour,
-				w.s.Time.Minute,
-				w.s.Time.Second,
-				w.s.Time.Millisecond*1000000,
+				w.Date.YY,
+				time.Month(w.Date.MM),
+				w.Date.DD,
+				w.Time.Hour,
+				w.Time.Minute,
+				w.Time.Second,
+				w.Time.Millisecond*1000000,
 				time.UTC,
 			).UTC().Format(time.RFC3339Nano), nil
 		}

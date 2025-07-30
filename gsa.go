@@ -4,32 +4,37 @@ import (
 	"github.com/adrianmo/go-nmea"
 )
 
-type WrappedGSA struct {
-	s nmea.GSA
+type wrappedGSA struct {
+	nmea.GSA
+}
+
+func NewGSA(s nmea.GSA) wrappedGSA {
+	result := wrappedGSA{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedGSA) String() string {
-	return w.s.String()
+func (w wrappedGSA) String() string {
+	return w.GSA.String()
 }
 
-func (w WrappedGSA) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedGSA) Prefix() string {
+	return w.GSA.Prefix()
 }
 
-func (w WrappedGSA) DataType() string {
-	return w.s.DataType()
+func (w wrappedGSA) DataType() string {
+	return w.GSA.DataType()
 }
 
-func (w WrappedGSA) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedGSA) TalkerID() string {
+	return w.GSA.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedGSA) GetNumberOfSatellites() (int64, error) {
-	return int64(len(w.s.SV)), nil
+func (w wrappedGSA) GetNumberOfSatellites() (int64, error) {
+	return int64(len(w.SV)), nil
 }
 
-func (w WrappedGSA) GetFixType() (string, error) {
-	return w.s.FixType, nil
+func (w wrappedGSA) GetFixType() (string, error) {
+	return w.FixType, nil
 }

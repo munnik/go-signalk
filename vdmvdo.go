@@ -158,13 +158,13 @@ func init() {
 	nmeaCodec = aisnmea.NMEACodecNew(aisCodec)
 }
 
-type WrappedVDMVDO struct {
-	s nmea.VDMVDO
+type wrappedVDMVDO struct {
+	nmea.VDMVDO
 	ais.Packet
 }
 
-func NewVDMVDO(s nmea.VDMVDO) WrappedVDMVDO {
-	result := WrappedVDMVDO{s: s}
+func NewVDMVDO(s nmea.VDMVDO) wrappedVDMVDO {
+	result := wrappedVDMVDO{VDMVDO: s}
 
 	p, _ := nmeaCodec.ParseSentence(s.String())
 	if p != nil {
@@ -174,24 +174,24 @@ func NewVDMVDO(s nmea.VDMVDO) WrappedVDMVDO {
 }
 
 // implement nmea.Sentence functions
-func (w WrappedVDMVDO) String() string {
-	return w.s.String()
+func (w wrappedVDMVDO) String() string {
+	return w.VDMVDO.String()
 }
 
-func (w WrappedVDMVDO) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedVDMVDO) Prefix() string {
+	return w.VDMVDO.Prefix()
 }
 
-func (w WrappedVDMVDO) DataType() string {
-	return w.s.DataType()
+func (w wrappedVDMVDO) DataType() string {
+	return w.VDMVDO.DataType()
 }
 
-func (w WrappedVDMVDO) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedVDMVDO) TalkerID() string {
+	return w.VDMVDO.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedVDMVDO) GetCallSign() (string, error) {
+func (w wrappedVDMVDO) GetCallSign() (string, error) {
 	if staticDataReport, ok := w.Packet.(ais.StaticDataReport); ok && staticDataReport.Valid && staticDataReport.ReportB.Valid {
 		return staticDataReport.ReportB.CallSign, nil
 	}
@@ -201,7 +201,7 @@ func (w WrappedVDMVDO) GetCallSign() (string, error) {
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetENINumber() (string, error) {
+func (w wrappedVDMVDO) GetENINumber() (string, error) {
 	if binaryBroadcastMessage, ok := w.Packet.(ais.BinaryBroadcastMessage); ok && binaryBroadcastMessage.Valid && binaryBroadcastMessage.ApplicationID.DesignatedAreaCode == 200 && binaryBroadcastMessage.ApplicationID.FunctionIdentifier == 10 {
 		eniNumber, err := extractString(binaryBroadcastMessage.BinaryData, 0, 48)
 		if err != nil {
@@ -212,28 +212,28 @@ func (w WrappedVDMVDO) GetENINumber() (string, error) {
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetIMONumber() (string, error) {
+func (w wrappedVDMVDO) GetIMONumber() (string, error) {
 	if shipStaticData, ok := w.Packet.(ais.ShipStaticData); ok && shipStaticData.Valid {
 		return fmt.Sprintf("%d", shipStaticData.ImoNumber), nil
 	}
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetMMSI() (string, error) {
+func (w wrappedVDMVDO) GetMMSI() (string, error) {
 	if w.Packet == nil || w.Packet.GetHeader() == nil {
 		return "", fmt.Errorf("value is unavailable")
 	}
 	return fmt.Sprintf("%d", w.Packet.GetHeader().UserID), nil
 }
 
-func (w WrappedVDMVDO) GetNavigationStatus() (string, error) {
+func (w wrappedVDMVDO) GetNavigationStatus() (string, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		return navigationStatuses[positionReport.NavigationalStatus], nil
 	}
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetVesselBeam() (float64, error) {
+func (w wrappedVDMVDO) GetVesselBeam() (float64, error) {
 	if binaryBroadcastMessage, ok := w.Packet.(ais.BinaryBroadcastMessage); ok && binaryBroadcastMessage.Valid && binaryBroadcastMessage.ApplicationID.DesignatedAreaCode == 200 && binaryBroadcastMessage.ApplicationID.FunctionIdentifier == 10 {
 		beam, err := extractNumber(binaryBroadcastMessage.BinaryData, 61, 10)
 		if err != nil {
@@ -249,7 +249,7 @@ func (w WrappedVDMVDO) GetVesselBeam() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetVesselLength() (float64, error) {
+func (w wrappedVDMVDO) GetVesselLength() (float64, error) {
 	if binaryBroadcastMessage, ok := w.Packet.(ais.BinaryBroadcastMessage); ok && binaryBroadcastMessage.Valid && binaryBroadcastMessage.ApplicationID.DesignatedAreaCode == 200 && binaryBroadcastMessage.ApplicationID.FunctionIdentifier == 10 {
 		length, err := extractNumber(binaryBroadcastMessage.BinaryData, 48, 13)
 		if err != nil {
@@ -265,7 +265,7 @@ func (w WrappedVDMVDO) GetVesselLength() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetVesselName() (string, error) {
+func (w wrappedVDMVDO) GetVesselName() (string, error) {
 	if staticDataReport, ok := w.Packet.(ais.StaticDataReport); ok && staticDataReport.Valid && staticDataReport.ReportA.Valid {
 		return staticDataReport.ReportA.Name, nil
 	}
@@ -278,7 +278,7 @@ func (w WrappedVDMVDO) GetVesselName() (string, error) {
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetVesselType() (string, error) {
+func (w wrappedVDMVDO) GetVesselType() (string, error) {
 	vesselTypeIndex := -1
 	if staticDataReport, ok := w.Packet.(ais.StaticDataReport); ok && staticDataReport.Valid && staticDataReport.ReportB.Valid {
 		vesselTypeIndex = int(staticDataReport.ReportB.ShipType)
@@ -293,7 +293,7 @@ func (w WrappedVDMVDO) GetVesselType() (string, error) {
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetRateOfTurn() (float64, error) {
+func (w wrappedVDMVDO) GetRateOfTurn() (float64, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		// https://gpsd.gitlab.io/gpsd/AIVDM.html
 		if positionReport.RateOfTurn == rateOfTurnNotAvailable {
@@ -317,7 +317,7 @@ func (w WrappedVDMVDO) GetRateOfTurn() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetTrueCourseOverGround() (float64, error) {
+func (w wrappedVDMVDO) GetTrueCourseOverGround() (float64, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		if positionReport.Cog == cogNotAvailable {
 			return 0, fmt.Errorf("value is unavailable")
@@ -339,7 +339,7 @@ func (w WrappedVDMVDO) GetTrueCourseOverGround() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetTrueHeading() (float64, error) {
+func (w wrappedVDMVDO) GetTrueHeading() (float64, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		if positionReport.TrueHeading == trueHeadingNotAvailable {
 			return 0, fmt.Errorf("value is unavailable")
@@ -361,7 +361,7 @@ func (w WrappedVDMVDO) GetTrueHeading() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetPosition2D() (float64, float64, error) {
+func (w wrappedVDMVDO) GetPosition2D() (float64, float64, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		if positionReport.Latitude != latitudeNotAvailable && positionReport.Longitude != longitudeNotAvailable {
 			return float64(positionReport.Latitude), float64(positionReport.Longitude), nil
@@ -380,7 +380,7 @@ func (w WrappedVDMVDO) GetPosition2D() (float64, float64, error) {
 	return 0, 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetSpeedOverGround() (float64, error) {
+func (w wrappedVDMVDO) GetSpeedOverGround() (float64, error) {
 	if positionReport, ok := w.Packet.(ais.PositionReport); ok && positionReport.Valid {
 		if positionReport.Sog != speedOverGroundNotAvailable {
 			return (unit.Speed(positionReport.Sog) * unit.Knot).MetersPerSecond(), nil
@@ -399,14 +399,14 @@ func (w WrappedVDMVDO) GetSpeedOverGround() (float64, error) {
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetDestination() (string, error) {
+func (w wrappedVDMVDO) GetDestination() (string, error) {
 	if shipStaticData, ok := w.Packet.(ais.ShipStaticData); ok && shipStaticData.Valid {
 		return shipStaticData.Destination, nil
 	}
 	return "", fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedVDMVDO) GetETA() (time.Time, error) {
+func (w wrappedVDMVDO) GetETA() (time.Time, error) {
 	if shipStaticData, ok := w.Packet.(ais.ShipStaticData); ok && shipStaticData.Valid {
 		result := time.Date(
 			time.Now().UTC().Year(),

@@ -6,42 +6,47 @@ import (
 	"github.com/adrianmo/go-nmea"
 )
 
-type WrappedGGA struct {
-	s nmea.GGA
+type wrappedGGA struct {
+	nmea.GGA
+}
+
+func NewGGA(s nmea.GGA) wrappedGGA {
+	result := wrappedGGA{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedGGA) String() string {
-	return w.s.String()
+func (w wrappedGGA) String() string {
+	return w.GGA.String()
 }
 
-func (w WrappedGGA) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedGGA) Prefix() string {
+	return w.GGA.Prefix()
 }
 
-func (w WrappedGGA) DataType() string {
-	return w.s.DataType()
+func (w wrappedGGA) DataType() string {
+	return w.GGA.DataType()
 }
 
-func (w WrappedGGA) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedGGA) TalkerID() string {
+	return w.GGA.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedGGA) GetNumberOfSatellites() (int64, error) {
-	if w.s.FixQuality != nmea.Invalid {
-		return w.s.NumSatellites, nil
+func (w wrappedGGA) GetNumberOfSatellites() (int64, error) {
+	if w.FixQuality != nmea.Invalid {
+		return w.NumSatellites, nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedGGA) GetPosition3D() (float64, float64, float64, error) {
-	if w.s.FixQuality != nmea.Invalid {
-		return w.s.Latitude, w.s.Longitude, w.s.Altitude, nil
+func (w wrappedGGA) GetPosition3D() (float64, float64, float64, error) {
+	if w.FixQuality != nmea.Invalid {
+		return w.Latitude, w.Longitude, w.Altitude, nil
 	}
 	return 0, 0, 0, fmt.Errorf("value is unavailable")
 }
 
-func (w WrappedGGA) GetFixQuality() (string, error) {
-	return w.s.FixQuality, nil
+func (w wrappedGGA) GetFixQuality() (string, error) {
+	return w.FixQuality, nil
 }

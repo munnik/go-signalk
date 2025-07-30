@@ -7,31 +7,36 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedTHS struct {
-	s nmea.THS
+type wrappedTHS struct {
+	nmea.THS
+}
+
+func NewTHS(s nmea.THS) wrappedTHS {
+	result := wrappedTHS{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedTHS) String() string {
-	return w.s.String()
+func (w wrappedTHS) String() string {
+	return w.THS.String()
 }
 
-func (w WrappedTHS) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedTHS) Prefix() string {
+	return w.THS.Prefix()
 }
 
-func (w WrappedTHS) DataType() string {
-	return w.s.DataType()
+func (w wrappedTHS) DataType() string {
+	return w.THS.DataType()
 }
 
-func (w WrappedTHS) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedTHS) TalkerID() string {
+	return w.THS.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedTHS) GetTrueHeading() (float64, error) {
-	if w.s.Status != nmea.InvalidTHS {
-		return (unit.Angle(w.s.Heading) * unit.Degree).Radians(), nil
+func (w wrappedTHS) GetTrueHeading() (float64, error) {
+	if w.Status != nmea.InvalidTHS {
+		return (unit.Angle(w.Heading) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }

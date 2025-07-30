@@ -7,29 +7,34 @@ import (
 	"github.com/martinlindhe/unit"
 )
 
-type WrappedRSA struct {
-	s nmea.RSA
+type wrappedRSA struct {
+	nmea.RSA
+}
+
+func NewRSA(s nmea.RSA) wrappedRSA {
+	result := wrappedRSA{s}
+	return result
 }
 
 // implement nmea.Sentence functions
-func (w WrappedRSA) String() string {
-	return w.s.String()
+func (w wrappedRSA) String() string {
+	return w.RSA.String()
 }
 
-func (w WrappedRSA) Prefix() string {
-	return w.s.Prefix()
+func (w wrappedRSA) Prefix() string {
+	return w.RSA.Prefix()
 }
 
-func (w WrappedRSA) DataType() string {
-	return w.s.DataType()
+func (w wrappedRSA) DataType() string {
+	return w.RSA.DataType()
 }
 
-func (w WrappedRSA) TalkerID() string {
-	return w.s.TalkerID()
+func (w wrappedRSA) TalkerID() string {
+	return w.RSA.TalkerID()
 }
 
 // implement SignalK functions
-func (w WrappedRSA) GetRudderAngle() (float64, error) {
+func (w wrappedRSA) GetRudderAngle() (float64, error) {
 	if _, err := w.GetRudderAnglePortside(); err == nil {
 		return 0, fmt.Errorf("not a single rudder system, use the specific functions for the startboard and portside rudder")
 	}
@@ -37,17 +42,17 @@ func (w WrappedRSA) GetRudderAngle() (float64, error) {
 }
 
 // GetRudderAngleStarboard retrieves the rudder angle of the startboard rudder from the sentence
-func (w WrappedRSA) GetRudderAngleStarboard() (float64, error) {
-	if w.s.StarboardRudderAngleStatus == nmea.StatusValid {
-		return (unit.Angle(w.s.StarboardRudderAngle) * unit.Degree).Radians(), nil
+func (w wrappedRSA) GetRudderAngleStarboard() (float64, error) {
+	if w.StarboardRudderAngleStatus == nmea.StatusValid {
+		return (unit.Angle(w.StarboardRudderAngle) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
 
 // GetRudderAnglePortside retrieves the rudder angle of the portside rudder from the sentence
-func (w WrappedRSA) GetRudderAnglePortside() (float64, error) {
-	if w.s.PortRudderAngleStatus == nmea.StatusValid {
-		return (unit.Angle(w.s.PortRudderAngle) * unit.Degree).Radians(), nil
+func (w wrappedRSA) GetRudderAnglePortside() (float64, error) {
+	if w.PortRudderAngleStatus == nmea.StatusValid {
+		return (unit.Angle(w.PortRudderAngle) * unit.Degree).Radians(), nil
 	}
 	return 0, fmt.Errorf("value is unavailable")
 }
