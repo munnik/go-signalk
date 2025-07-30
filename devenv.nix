@@ -1,8 +1,8 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 # let
 #   pkgs-unstable =
 #     import inputs.nixpkgs-unstable { inherit (pkgs.stdenv) system; };
-# in 
+# in
 {
   packages = with pkgs; [ gnugrep goreleaser prettierd shellcheck shfmt taplo ];
 
