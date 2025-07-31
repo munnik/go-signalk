@@ -2,7 +2,6 @@ package signalk
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/adrianmo/go-nmea"
@@ -216,35 +215,15 @@ type Alarm interface {
 	GetDescription() (string, error)
 }
 
-type customCheckCRC struct {
-	allowEmptyChecksum    bool
-	allowChecksumMismatch bool
-}
-
-func (ccc customCheckCRC) CheckCRC(sentence nmea.BaseSentence, rawFields string) error {
-	err := nmea.CheckCRC(sentence, rawFields)
-	if ccc.allowEmptyChecksum && strings.Contains(err.Error(), "nmea: sentence does not contain checksum separator") {
-		err = nil
+func Parse(raw string, parsers ...nmea.SentenceParser) (nmea.Sentence, error) {
+	if len(parsers) > 1 {
+		return nil, fmt.Errorf("only one parser can be provided")
 	}
-	if ccc.allowChecksumMismatch && strings.Contains(err.Error(), "nmea: sentence checksum mismatch") {
-		err = nil
+	parser := nmea.SentenceParser{}
+	if len(parsers) == 1 {
+		parser = parsers[0]
 	}
-	return err
-}
-
-func Parse(raw string, options ...string) (nmea.Sentence, error) {
-	ccc := customCheckCRC{}
-	for _, option := range options {
-		if option == "AllowEmptyChecksum" {
-			ccc.allowEmptyChecksum = true
-		}
-		if option == "AllowChecksumMismatch" {
-			ccc.allowChecksumMismatch = true
-		}
-	}
-
-	sp := nmea.SentenceParser{CheckCRC: ccc.CheckCRC}
-	s, error := sp.Parse(raw)
+	s, error := parser.Parse(raw)
 	if error != nil {
 		return nil, error
 	}
