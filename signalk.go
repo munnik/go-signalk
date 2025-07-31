@@ -2,6 +2,7 @@ package signalk
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/adrianmo/go-nmea"
@@ -215,8 +216,35 @@ type Alarm interface {
 	GetDescription() (string, error)
 }
 
-func Parse(raw string) (nmea.Sentence, error) {
-	s, error := nmea.Parse(raw)
+type customCheckCRC struct {
+	allowEmptyChecksum    bool
+	allowChecksumMismatch bool
+}
+
+func (ccc customCheckCRC) CheckCRC(sentence nmea.BaseSentence, rawFields string) error {
+	err := nmea.CheckCRC(sentence, rawFields)
+	if ccc.allowEmptyChecksum && strings.Contains(err.Error(), "nmea: sentence does not contain checksum separator") {
+		err = nil
+	}
+	if ccc.allowChecksumMismatch && strings.Contains(err.Error(), "nmea: sentence checksum mismatch") {
+		err = nil
+	}
+	return err
+}
+
+func Parse(raw string, options ...string) (nmea.Sentence, error) {
+	ccc := customCheckCRC{}
+	for _, option := range options {
+		if option == "AllowEmptyChecksum" {
+			ccc.allowEmptyChecksum = true
+		}
+		if option == "AllowChecksumMismatch" {
+			ccc.allowChecksumMismatch = true
+		}
+	}
+
+	sp := nmea.SentenceParser{CheckCRC: ccc.CheckCRC}
+	s, error := sp.Parse(raw)
 	if error != nil {
 		return nil, error
 	}
